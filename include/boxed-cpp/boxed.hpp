@@ -207,19 +207,30 @@ struct hash<boxed::detail::boxed<T, U>>
 } // namespace std
 // {{{ fmtlib integration
 // clang-format off
-#if __has_include(<fmt/format.h>)
+#if __has_include(<format>)
+#include <format>
+// clang-format on
 
+template <typename Type, typename Tag>
+struct std::formatter<boxed::detail::boxed<Type, Tag>>: std::formatter<Type>
+{
+    auto format(boxed::detail::boxed<Type, Tag> const& val, auto& ctx) const
+    {
+        return std::formatter<Type>::format(val.value, ctx);
+    }
+};
+#elif __has_include(<fmt/format.h>)
+
+// clang-format off
 #include <fmt/format.h>
 // clang-format on
 
 template <typename Type, typename Tag>
-struct fmt::formatter<boxed::detail::boxed<Type, Tag>>
+struct fmt::formatter<boxed::detail::boxed<Type, Tag>>: fmt::formatter<Type>
 {
-    constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-
     auto format(boxed::detail::boxed<Type, Tag> const& val, fmt::format_context& ctx) const
     {
-        return fmt::format_to(ctx.out(), "{}", val.value);
+        return fmt::formatter<Type>::format(val.value, ctx);
     }
 };
 
