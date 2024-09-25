@@ -189,7 +189,7 @@ struct Wrap
 {
     overload<Ts...> func_wrap;
 
-    Wrap(Ts... funcs): func_wrap(funcs...) {}
+    Wrap(Ts... funcs): func_wrap { funcs... } {}
 
     template <typename... Args>
     auto operator()(Args... args)
@@ -215,3 +215,24 @@ TEST_CASE("advanced")
     REQUIRE(x_coord(rho, theta, phi) == x_coord(theta, phi, rho));
     REQUIRE(x_coord(phi, theta, rho) == x_coord(phi, theta, rho));
 }
+
+#ifdef __has_include
+    #if __has_include(<version>)
+        #include <version>
+    #endif
+#endif
+
+#if defined(__cpp_lib_format) // && __cpp_lib_format >= 202207LL
+TEST_CASE("formatter")
+{
+    auto constexpr l = Length { 3 };
+    auto constexpr f = From { 2 };
+    auto constexpr t = To { 4 };
+    auto constexpr bd = BoxedDouble { 3.14 };
+
+    REQUIRE(std::format("{}", l) == "3");
+    REQUIRE(std::format("{}", f) == "2");
+    REQUIRE(std::format("{}", t) == "4");
+    REQUIRE(std::format("{}", bd) == "3.14");
+}
+#endif
