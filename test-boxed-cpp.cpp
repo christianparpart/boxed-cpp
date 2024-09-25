@@ -189,7 +189,7 @@ struct Wrap
 {
     overload<Ts...> func_wrap;
 
-    Wrap(Ts... funcs): func_wrap(funcs...) {}
+    Wrap(Ts... funcs): func_wrap { funcs... } {}
 
     template <typename... Args>
     auto operator()(Args... args)
